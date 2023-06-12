@@ -1,15 +1,25 @@
 package nextflow.validation
 
-// A class that works like Map, but returns an immutable copy with each method
-class ImmutableMap extends LinkedHashMap {
+import com.google.common.hash.Hasher
+import nextflow.util.CacheHelper.HashMode
+import nextflow.util.CacheFunnel
 
-    private Map internalMap
+// A class that works like Map, but returns an immutable copy with each method
+public class ImmutableMap extends LinkedHashMap implements CacheFunnel {
+
+    Map internalMap
 
     ImmutableMap(Map initialMap) {
         internalMap = initialMap
     }
 
     // Override the methods of the Map interface
+
+    @Override
+    Hasher funnel(Hasher hasher, HashMode mode) {
+        hasher.putUnencodedChars(internalMap)
+        return hasher
+    }
 
     @Override
     int size() {
